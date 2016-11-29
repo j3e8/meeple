@@ -1,6 +1,7 @@
 var Body = {};
 
 Body.armature = {
+  id: 'body',
   headPosition: { x: -4, y: -102 },
   frontArmPosition: { x: -30.4, y: -28.8},
   rearArmPosition: { x: 23.7, y: -32},

@@ -1,22 +1,24 @@
 var Person = {};
 
+Person.composition = [
+  { 'z': 10, 'class': 'RearArm' },
+  { 'z': 20, 'class': 'RearLeg' },
+  { 'z': 30, 'class': 'Body' },
+  { 'z': 40, 'class': 'HairBehind' },
+  { 'z': 50, 'class': 'Head' },
+  { 'z': 60, 'class': 'Eyes' },
+  { 'z': 70, 'class': 'Eyebrows' },
+  { 'z': 80, 'class': 'Beard' },
+  { 'z': 90, 'class': 'Nose' },
+  { 'z': 100, 'class': 'Mouth' },
+  { 'z': 110, 'class': 'Hair' },
+  { 'z': 120, 'class': 'FrontLeg' },
+  { 'z': 130, 'class': 'FrontArm' }
+];
+
 Person.create = function() {
   return {
-    composition: [
-      { 'z': 10, 'class': 'RearArm' },
-      { 'z': 20, 'class': 'RearLeg' },
-      { 'z': 30, 'class': 'Body' },
-      { 'z': 40, 'class': 'RearHair' },
-      { 'z': 50, 'class': 'Head' },
-      { 'z': 60, 'class': 'Eyes' },
-      { 'z': 70, 'class': 'Eyebrows' },
-      { 'z': 80, 'class': 'Beard' },
-      { 'z': 90, 'class': 'Nose' },
-      { 'z': 100, 'class': 'Mouth' },
-      { 'z': 110, 'class': 'Hair' },
-      { 'z': 120, 'class': 'FrontLeg' },
-      { 'z': 130, 'class': 'FrontArm' }
-    ]
+    composition: Person.composition
   }
 }
 

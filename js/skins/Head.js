@@ -1,6 +1,7 @@
 var Head = {};
 
 Head.armature = {
+  id: 'head',
   imageUrl: 'head.svg',
   offset: { x: 76, y: 67 }
 }

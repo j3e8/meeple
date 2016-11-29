@@ -2,54 +2,6 @@ var app = angular.module("mainApp", []);
 
 var SVG_URL = 'http://localhost:8080/svg';
 
-app.controller("mainController", function($scope, $http) {
-
-});
-
-app.directive("artboard", function() {
-  return {
-    restrict: 'A',
-    scope: {},
-    template: '',
-    link: function($scope, $element, $attrs) {
-
-      var viewSize = {
-        width: 500,
-        height: 500
-      };
-
-      var ani = new Animation(document.getElementById('artboard'), animate, render, viewSize);
-
-      var basePerson = Person.createBaseSkin();
-
-      function animate(elapsedTime) {
-        var canvasSize = {
-          width: ani.getWidth(),
-          height: ani.getHeight()
-        };
-        return true;
-      }
-
-      function render(htmlCanvas) {
-        var ctx = htmlCanvas.getContext("2d");
-
-        var canvasSize = {
-          width: ani.getWidth(),
-          height: ani.getHeight()
-        };
-
-        var xscale = canvasSize.width / viewSize.width;
-        var yscale = canvasSize.height / viewSize.height;
-        var scale = Math.min(xscale, yscale);
-
-        ctx.clearRect(0, 0, canvasSize.width, canvasSize.height);
-        Person.render(ctx, basePerson, canvasSize, scale);
-      }
-
-    }
-  };
-});
-
 function Animation(htmlContainer, animationCallback, renderCallback, viewSize) {
   var htmlCanvas = null;
   var aspectRatio = viewSize.width / viewSize.height;
@@ -143,23 +95,25 @@ MathUtil.scalePoint = function(pt, scale) {
 
 var Person = {};
 
+Person.composition = [
+  { 'z': 10, 'class': 'RearArm' },
+  { 'z': 20, 'class': 'RearLeg' },
+  { 'z': 30, 'class': 'Body' },
+  { 'z': 40, 'class': 'HairBehind' },
+  { 'z': 50, 'class': 'Head' },
+  { 'z': 60, 'class': 'Eyes' },
+  { 'z': 70, 'class': 'Eyebrows' },
+  { 'z': 80, 'class': 'Beard' },
+  { 'z': 90, 'class': 'Nose' },
+  { 'z': 100, 'class': 'Mouth' },
+  { 'z': 110, 'class': 'Hair' },
+  { 'z': 120, 'class': 'FrontLeg' },
+  { 'z': 130, 'class': 'FrontArm' }
+];
+
 Person.create = function() {
   return {
-    composition: [
-      { 'z': 10, 'class': 'RearArm' },
-      { 'z': 20, 'class': 'RearLeg' },
-      { 'z': 30, 'class': 'Body' },
-      { 'z': 40, 'class': 'RearHair' },
-      { 'z': 50, 'class': 'Head' },
-      { 'z': 60, 'class': 'Eyes' },
-      { 'z': 70, 'class': 'Eyebrows' },
-      { 'z': 80, 'class': 'Beard' },
-      { 'z': 90, 'class': 'Nose' },
-      { 'z': 100, 'class': 'Mouth' },
-      { 'z': 110, 'class': 'Hair' },
-      { 'z': 120, 'class': 'FrontLeg' },
-      { 'z': 130, 'class': 'FrontArm' }
-    ]
+    composition: Person.composition
   }
 }
 
@@ -254,11 +208,124 @@ SVGUtil.getSize = function(svgElement) {
   return svgSize;
 }
 
+app.directive("artboard", function() {
+  return {
+    restrict: 'A',
+    scope: {},
+    template: '',
+    link: function($scope, $element, $attrs) {
+
+      var viewSize = {
+        width: 450,
+        height: 450
+      };
+
+      var ani = new Animation(document.getElementById('artboard'), animate, render, viewSize);
+      var basePerson = Person.createBaseSkin();
+
+      function animate(elapsedTime) {
+        var canvasSize = {
+          width: ani.getWidth(),
+          height: ani.getHeight()
+        };
+        return true;
+      }
+
+      function render(htmlCanvas) {
+        var ctx = htmlCanvas.getContext("2d");
+
+        var canvasSize = {
+          width: ani.getWidth(),
+          height: ani.getHeight()
+        };
+
+        var xscale = canvasSize.width / viewSize.width;
+        var yscale = canvasSize.height / viewSize.height;
+        var scale = Math.min(xscale, yscale);
+
+        ctx.clearRect(0, 0, canvasSize.width, canvasSize.height);
+        Person.render(ctx, basePerson, canvasSize, scale);
+      }
+
+      $scope.$on("importSvg", function($event, data) {
+        var reader = new FileReader();
+        reader.onload = function () {
+          $scope.createSkin(data.skinClass, reader.result);
+        };
+        reader.readAsDataURL(data.file);
+      });
+
+      $scope.createSkin = function(skinClass, data) {
+        console.log(skinClass, data);
+      }
+    }
+  };
+});
+
+app.controller("mainController", function($scope, $http) {
+  $scope.selectedArmature = 'body';
+  $scope.armatures = [
+    { id: 'body', name: 'Body' },
+    { id: 'head', name: 'Head' },
+    { id: 'frontarm', name: 'Front arm' },
+    { id: 'frontleg', name: 'Front leg' },
+    { id: 'reararm', name: 'Rear arm' },
+    { id: 'rearleg', name: 'Rear leg' }
+  ];
+  $scope.zIndex = 110;
+  $scope.svgBase64 = '';
+  $scope.themes = [
+    { id: 'beach', name: 'Beach'},
+    { id: 'christmas', name: 'Christmas'},
+    { id: 'city', name: 'City'},
+    { id: 'farm', name: 'Farm'},
+    { id: 'generic', name: 'Generic'},
+    { id: 'halloween', name: 'Halloween'},
+    { id: 'mall', name: 'Mall'},
+    { id: 'sky', name: 'Sky'},
+    { id: 'suburb', name: 'Suburb'}
+  ];
+  $scope.selectedThemes = [];
+  $scope.skinClassDialogIsDisplayed = undefined;
+
+  $scope.dragOver = function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = 'copy';
+  }
+
+  $scope.dragEnter = function(event) {
+    event.dataTransfer.dropEffect = 'copy';
+  }
+
+  $scope.dragLeave = function(event) {
+    event.dataTransfer.dropEffect = 'copy';
+  }
+
+  $scope.importSvg = function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    $scope.skinClass = null;
+    $scope.skinClassDialogIsDisplayed = true;
+    $scope.importedFile = event.dataTransfer.files[0];
+    $scope.$apply();
+  }
+
+  $scope.addSvgToView = function(skinClass) {
+    $scope.skinClassDialogIsDisplayed = false;
+    $scope.$broadcast("importSvg", {
+      'skinClass': skinClass,
+      'file': $scope.importedFile
+    });
+  }
+});
+
 var Beard = {};
 
 var Body = {};
 
 Body.armature = {
+  id: 'body',
   headPosition: { x: -4, y: -102 },
   frontArmPosition: { x: -30.4, y: -28.8},
   rearArmPosition: { x: 23.7, y: -32},
@@ -279,6 +346,7 @@ var Eyes = {};
 var FrontArm = {};
 
 FrontArm.armature = {
+  id: 'frontarm',
   imageUrl: 'arm.svg',
   handPosition: { x: 51.2, y: -0.1 },
   offset: { x: 14.7, y: 15.1 },
@@ -293,6 +361,7 @@ FrontArm.getPosition = function(startPt, scale) {
 var FrontLeg = {};
 
 FrontLeg.armature = {
+  id: 'frontleg',
   imageUrl: 'leg.svg',
   footPosition: { x: 45.7, y: 0 },
   offset: { x: 12.1, y: 32.2 },
@@ -306,9 +375,12 @@ FrontLeg.getPosition = function(startPt, scale) {
 
 var Hair = {};
 
+var HairBehind = {};
+
 var Head = {};
 
 Head.armature = {
+  id: 'head',
   imageUrl: 'head.svg',
   offset: { x: 76, y: 67 }
 }
@@ -325,6 +397,7 @@ var Nose = {};
 var RearArm = {};
 
 RearArm.armature = {
+  id: 'reararm',
   imageUrl: 'arm.svg',
   handPosition: { x: 51.2, y: -0.1 },
   offset: { x: 14.7, y: 15.1 },
@@ -336,11 +409,10 @@ RearArm.getPosition = function(startPt, scale) {
   return MathUtil.addPoints(startPt, scaledRearArmPosition);
 }
 
-var RearHair = {};
-
 var RearLeg = {};
 
 RearLeg.armature = {
+  id: 'rearleg',
   imageUrl: 'leg.svg',
   footPosition: { x: 45.7, y: 0 },
   offset: { x: 12.1, y: 32.2 },
@@ -367,7 +439,6 @@ Skin.importSvg = function(skinClass) {
 
   SVGUtil.loadSvg(SVG_URL + '/' + imageUrl, function(svgElement) {
     skin.size = SVGUtil.getSize(svgElement);
-    console.log(skin);
   });
 
   return skin;
@@ -377,3 +448,22 @@ Skin.createBaseSkin = function(skinClass) {
   var skin = Skin.importSvg(skinClass);
   return skin;
 }
+
+app.directive("skinClassDialog", function() {
+  return {
+    restrict: 'E',
+    scope: {
+      onChoose: '='
+    },
+    templateUrl: 'js/directives/skin-class-dialog/skin-class-dialog.html',
+    link: function($scope, $element, $attrs) {
+      $scope.skinClass = 'Body';
+      $scope.skinClasses = Person.composition.slice(0).sort(function(a, b) {
+        if (a.z == b.z) {
+          return 0;
+        }
+        return a.z > b.z ? -1 : 1;
+      })
+    }
+  }
+});

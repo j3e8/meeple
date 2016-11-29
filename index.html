@@ -8,8 +8,18 @@
     <link rel="stylesheet" type="text/css" href="main.css">
   </head>
   <body ng-controller="mainController">
-    <div id="artboard" artboard></div>
+    <div id="artboard" artboard ondrop="angular.element(this).scope().importSvg(event)" ondragover="angular.element(this).scope().dragOver(event, this)" ondragenter="angular.element(this).scope().dragEnter(event, this)" ondragleave="angular.element(this).scope().dragLeave(event, this)"></div>
     <footer>
+      Attach to <select ng-options="a.id as a.name for a in armatures" ng-model="selectedArmature"></select>
+      <input type="number" ng-model="zIndex">
+
+      Themes <select ng-options="t.id as t.name for t in themes" ng-model="selectedTheme"></select> <button>Add</button>
+
+      <div class="breathe">
+        <button>Save</button>
+      </div>
     </footer>
+
+    <skin-class-dialog on-choose="addSvgToView" ng-show="skinClassDialogIsDisplayed"></skin-class-dialog>
   </body>
 </html>

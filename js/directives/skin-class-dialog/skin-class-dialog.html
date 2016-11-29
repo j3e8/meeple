@@ -1,0 +1,6 @@
+<div class="dialog-shadow"></div>
+<div class="dialog-box">
+  <h2>Import svg as</h2>
+  <select ng-options="s.class as s.class for s in skinClasses" ng-model="skinClass"></select>
+  <button ng-click="onChoose(skinClass)">Import</button>
+</div>

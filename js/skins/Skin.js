@@ -13,7 +13,6 @@ Skin.importSvg = function(skinClass) {
 
   SVGUtil.loadSvg(SVG_URL + '/' + imageUrl, function(svgElement) {
     skin.size = SVGUtil.getSize(svgElement);
-    console.log(skin);
   });
 
   return skin;
