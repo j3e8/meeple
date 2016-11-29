@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Canvas Test</title>
+  <script>
+    var whos = [];
+
+    window.addEventListener("load", function() {
+      var startTime = new Date().getTime();
+      console.log("instantiate images", startTime);
+      for (var i=0; i < 8100; i++) {
+        var img = new Image();
+        img.src = "http://localhost:8080/svg/base.svg";
+        whos.push(img);
+      }
+      var endTime = new Date().getTime();
+      console.log("done", whos.length, endTime);
+      console.log("elapsed:", endTime - startTime)
+
+      setTimeout(function() {
+        render();
+      }, 1000);
+    });
+
+    function render() {
+      var startTime = new Date().getTime();
+      console.log("rendering " + whos.length + " images", startTime);
+      var htmlCanvas = document.getElementById('pants');
+      var ctx = htmlCanvas.getContext("2d");
+
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, htmlCanvas.width, htmlCanvas.height);
+
+      var ratio = whos[0].width / whos[0].height;
+      var h = 32;
+      var whoSize = {
+        width: h * ratio,
+        height: h
+      };
+
+      for (var i=0; i < whos.length; i++) {
+        if (whos[i].width && whos[i].height) {
+          var x = (i * 112) % htmlCanvas.width;
+          var y = (i * 231) % htmlCanvas.height;
+
+          ctx.drawImage(whos[i], x, y, whoSize.width, whoSize.height);
+        }
+      }
+
+      var endTime = new Date().getTime();
+      console.log("done", endTime);
+      console.log("elapsed:", endTime - startTime)
+    }
+  </script>
+</head>
+<body>
+  <canvas id="pants" width="500" height="500"></canvas>
+</body>
+</html>
