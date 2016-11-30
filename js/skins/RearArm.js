@@ -1,6 +1,7 @@
 var RearArm = {};
 
 RearArm.armature = {
+  class: 'RearArm',
   id: 'reararm',
   imageUrl: 'arm.svg',
   handPosition: { x: 51.2, y: -0.1 },

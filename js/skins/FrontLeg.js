@@ -1,6 +1,7 @@
 var FrontLeg = {};
 
 FrontLeg.armature = {
+  class: 'FrontLeg',
   id: 'frontleg',
   imageUrl: 'leg.svg',
   footPosition: { x: 45.7, y: 0 },

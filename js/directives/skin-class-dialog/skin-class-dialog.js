@@ -7,7 +7,7 @@ app.directive("skinClassDialog", function() {
     templateUrl: 'js/directives/skin-class-dialog/skin-class-dialog.html',
     link: function($scope, $element, $attrs) {
       $scope.skinClass = 'Body';
-      $scope.skinClasses = Person.composition.slice(0).sort(function(a, b) {
+      $scope.skinClasses = Person.getComposition().slice(0).sort(function(a, b) {
         if (a.z == b.z) {
           return 0;
         }

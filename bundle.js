@@ -18,6 +18,10 @@ function Animation(htmlContainer, animationCallback, renderCallback, viewSize) {
     fillParent();
   });
 
+  this.getCanvas = function() {
+    return htmlCanvas;
+  }
+
   this.getWidth = function() {
     return htmlCanvas.width;
   }
@@ -93,27 +97,48 @@ MathUtil.scalePoint = function(pt, scale) {
   }
 }
 
+MathUtil.subtractPoints = function(a, b) {
+  return {
+    x: a.x - b.x,
+    y: a.y - b.y
+  }
+}
+
+var MouseState = {
+  draggedSkin: null,
+  lastDownPoint: {
+    x: 0,
+    y: 0
+  },
+  lastMovePoint: {
+    x: 0,
+    y: 0
+  }
+};
+
 var Person = {};
 
-Person.composition = [
-  { 'z': 10, 'class': 'RearArm' },
-  { 'z': 20, 'class': 'RearLeg' },
-  { 'z': 30, 'class': 'Body' },
-  { 'z': 40, 'class': 'HairBehind' },
-  { 'z': 50, 'class': 'Head' },
-  { 'z': 60, 'class': 'Eyes' },
-  { 'z': 70, 'class': 'Eyebrows' },
-  { 'z': 80, 'class': 'Beard' },
-  { 'z': 90, 'class': 'Nose' },
-  { 'z': 100, 'class': 'Mouth' },
-  { 'z': 110, 'class': 'Hair' },
-  { 'z': 120, 'class': 'FrontLeg' },
-  { 'z': 130, 'class': 'FrontArm' }
-];
+Person.getComposition = function() {
+  return [
+    { 'z': 10, 'class': 'RearArm' },
+    { 'z': 20, 'class': 'RearLeg' },
+    { 'z': 30, 'class': 'Body' },
+    { 'z': 40, 'class': 'HairBehind' },
+    { 'z': 50, 'class': 'Head' },
+    { 'z': 60, 'class': 'Eyes' },
+    { 'z': 70, 'class': 'Eyebrows' },
+    { 'z': 80, 'class': 'Beard' },
+    { 'z': 90, 'class': 'Nose' },
+    { 'z': 100, 'class': 'Mouth' },
+    { 'z': 110, 'class': 'Hair' },
+    { 'z': 120, 'class': 'FrontLeg' },
+    { 'z': 130, 'class': 'FrontArm' }
+  ];
+}
 
 Person.create = function() {
   return {
-    composition: Person.composition
+    composition: Person.getComposition()
   }
 }
 
@@ -152,20 +177,20 @@ Person.render = function(ctx, person, canvasSize, scale) {
   });
 }
 
-Person.calculateComponentPoint = function(component, scale) {
+Person.calculateSkinPoint = function(skin, scale) {
   var pos = {
     x: 0,
     y: 0
   };
-  if (component.armature.offset) {
-    pos.x = -component.armature.offset.x * scale;
-    pos.y = -component.armature.offset.y * scale;
+  if (skin.offset) {
+    pos.x = -skin.offset.x * scale;
+    pos.y = -skin.offset.y * scale;
   }
   return pos;
 }
 
 Person.renderComponentSkin = function(ctx, component, skin, position, scale) {
-  var pt = Person.calculateComponentPoint(component, scale);
+  var pt = Person.calculateSkinPoint(skin, scale);
   if (skin.size) {
     ctx.save();
     ctx.translate(position.x, position.y);
@@ -181,6 +206,13 @@ Person.renderComponentSkin = function(ctx, component, skin, position, scale) {
 
     ctx.restore();
   }
+}
+
+Person.addSkin = function(person, skin) {
+  var comp = person.composition.find(function(c) {
+    return c.class == skin.class;
+  });
+  comp.skin = skin;
 }
 
 var SVGUtil = {};
@@ -202,8 +234,8 @@ SVGUtil.loadSvg = function(url, callback) {
 
 SVGUtil.getSize = function(svgElement) {
   var svgSize = {
-    width: parseFloat(svgElement.getAttribute('width')) || svgElement.getAttribute('viewBox').split(' ')[2],
-    height: parseFloat(svgElement.getAttribute('height')) || svgElement.getAttribute('viewBox').split(' ')[3]
+    width: parseFloat(svgElement.getAttribute('width')) || parseFloat(svgElement.getAttribute('viewBox').split(' ')[2]),
+    height: parseFloat(svgElement.getAttribute('height')) || parseFloat(svgElement.getAttribute('viewBox').split(' ')[3])
   };
   return svgSize;
 }
@@ -220,14 +252,38 @@ app.directive("artboard", function() {
         height: 450
       };
 
-      var ani = new Animation(document.getElementById('artboard'), animate, render, viewSize);
       var basePerson = Person.createBaseSkin();
+      var person = Person.create();
+
+      var ani = new Animation(document.getElementById('artboard'), animate, render, viewSize);
+      ani.getCanvas().addEventListener("mousedown", function(event) {
+        var rect = ani.getCanvas().getBoundingClientRect();
+        var pt = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+        mouseDown(pt);
+      });
+      ani.getCanvas().addEventListener("mousemove", function(event) {
+        var rect = ani.getCanvas().getBoundingClientRect();
+        var pt = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+        mouseMove(pt);
+      });
+      ani.getCanvas().addEventListener("mouseup", function(event) {
+        var rect = ani.getCanvas().getBoundingClientRect();
+        var pt = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+        mouseUp(pt);
+      });
+
+      var scale = 1;
 
       function animate(elapsedTime) {
         var canvasSize = {
           width: ani.getWidth(),
           height: ani.getHeight()
         };
+
+        var xscale = canvasSize.width / viewSize.width;
+        var yscale = canvasSize.height / viewSize.height;
+        scale = Math.min(xscale, yscale);
+
         return true;
       }
 
@@ -239,12 +295,9 @@ app.directive("artboard", function() {
           height: ani.getHeight()
         };
 
-        var xscale = canvasSize.width / viewSize.width;
-        var yscale = canvasSize.height / viewSize.height;
-        var scale = Math.min(xscale, yscale);
-
         ctx.clearRect(0, 0, canvasSize.width, canvasSize.height);
         Person.render(ctx, basePerson, canvasSize, scale);
+        Person.render(ctx, person, canvasSize, scale);
       }
 
       $scope.$on("importSvg", function($event, data) {
@@ -256,7 +309,35 @@ app.directive("artboard", function() {
       });
 
       $scope.createSkin = function(skinClass, data) {
-        console.log(skinClass, data);
+        if (window[skinClass]) {
+          var newSkin = Skin.importSvg(window[skinClass], data);
+          Person.addSkin(person, newSkin);
+        }
+      }
+
+      function mouseDown(pt) {
+        for (var i=0; i < person.composition.length; i++) {
+          if (person.composition[i].skin && Skin.hitTest(person.composition[i].skin, pt)) {
+            MouseState.draggedSkin = person.composition[i].skin;
+            break;
+          }
+        }
+        MouseState.lastDownPoint = Object.assign({}, pt);
+        MouseState.lastMovePoint = Object.assign({}, pt);
+      }
+
+      function mouseMove(pt) {
+        if (MouseState.draggedSkin) {
+          var delta = MathUtil.subtractPoints(pt, MouseState.lastMovePoint);
+          var scaledDelta = MathUtil.scalePoint(delta, 1 / scale);
+          console.log(delta, scaledDelta);
+          Skin.move(MouseState.draggedSkin, scaledDelta);
+        }
+        MouseState.lastMovePoint = Object.assign({}, pt);
+      }
+
+      function mouseUp(pt) {
+        MouseState.draggedSkin = null;
       }
     }
   };
@@ -322,9 +403,15 @@ app.controller("mainController", function($scope, $http) {
 
 var Beard = {};
 
+Beard.armature = {
+  class: 'Beard',
+  id: 'beard'
+}
+
 var Body = {};
 
 Body.armature = {
+  class: 'Body',
   id: 'body',
   headPosition: { x: -4, y: -102 },
   frontArmPosition: { x: -30.4, y: -28.8},
@@ -341,11 +428,22 @@ Body.getPosition = function(startPt, scale) {
 
 var Eyebrows = {};
 
+Eyebrows.armature = {
+  class: 'Eyebrows',
+  id: 'eyebrows'
+}
+
 var Eyes = {};
+
+Eyes.armature = {
+  class: 'Eyes',
+  id: 'eyes'
+}
 
 var FrontArm = {};
 
 FrontArm.armature = {
+  class: 'FrontArm',
   id: 'frontarm',
   imageUrl: 'arm.svg',
   handPosition: { x: 51.2, y: -0.1 },
@@ -361,6 +459,7 @@ FrontArm.getPosition = function(startPt, scale) {
 var FrontLeg = {};
 
 FrontLeg.armature = {
+  class: 'FrontLeg',
   id: 'frontleg',
   imageUrl: 'leg.svg',
   footPosition: { x: 45.7, y: 0 },
@@ -375,11 +474,27 @@ FrontLeg.getPosition = function(startPt, scale) {
 
 var Hair = {};
 
+Hair.armature = {
+  class: 'Hair',
+  id: 'hair'
+}
+
+Hair.getPosition = function(startPt, scale) {
+  var scaledPosition = MathUtil.scalePoint(Body.armature.headPosition, scale);
+  return MathUtil.addPoints(startPt, scaledPosition);
+}
+
 var HairBehind = {};
+
+HairBehind.armature = {
+  class: 'HairBehind',
+  id: 'hairbehind'
+}
 
 var Head = {};
 
 Head.armature = {
+  class: 'Head',
   id: 'head',
   imageUrl: 'head.svg',
   offset: { x: 76, y: 67 }
@@ -392,11 +507,22 @@ Head.getPosition = function(startPt, scale) {
 
 var Mouth = {};
 
+Mouth.armature = {
+  class: 'Mouth',
+  id: 'mouth'
+}
+
 var Nose = {};
+
+Nose.armature = {
+  class: 'Nose',
+  id: 'nose'
+}
 
 var RearArm = {};
 
 RearArm.armature = {
+  class: 'RearArm',
   id: 'reararm',
   imageUrl: 'arm.svg',
   handPosition: { x: 51.2, y: -0.1 },
@@ -412,6 +538,7 @@ RearArm.getPosition = function(startPt, scale) {
 var RearLeg = {};
 
 RearLeg.armature = {
+  class: 'RearLeg',
   id: 'rearleg',
   imageUrl: 'leg.svg',
   footPosition: { x: 45.7, y: 0 },
@@ -426,16 +553,42 @@ RearLeg.getPosition = function(startPt, scale) {
 
 var Skin = {};
 
-Skin.importSvg = function(skinClass) {
+Skin.createSkin = function(skinClass) {
+  var offset = { x: 0, y: 0 };
+  var rotation = 0;
+  var skin = {
+    'class': skinClass.armature.class,
+    'image': null,
+    'offset': skinClass.armature && skinClass.armature.offset ? skinClass.armature.offset : offset,
+    'rotation': skinClass.armature && skinClass.armature.rotation ? skinClass.armature.rotation : rotation
+  };
+  return skin;
+}
+
+Skin.importSvg = function(skinClass, base64) {
+  var skin = Skin.createSkin(skinClass);
+  skin.image = new Image();
+  skin.image.src = base64;
+
+  var pos = base64.indexOf('base64,');
+  var svgText = atob(base64.substring(pos + 7));
+  var div = document.createElement("div");
+  div.innerHTML = svgText;
+  var svgElement = div.getElementsByTagName('svg')[0];
+  skin.size = SVGUtil.getSize(svgElement);
+  if (!skinClass.armature || !skinClass.armature.offset || !(skinClass.armature.offset.x && !skinClass.armature.offset.y)) {
+    skin.offset = { x: skin.size.width / 2, y: skin.size.height / 2 };
+  }
+  return skin;
+}
+
+Skin.createBaseSkin = function(skinClass) {
   var imageUrl = skinClass.armature.imageUrl;
   var svgImage = new Image();
   svgImage.src = SVG_URL + '/' + imageUrl;
 
-  var skin = {
-    'image': svgImage,
-    'offset': skinClass.armature.offset,
-    'rotation': skinClass.armature.rotation
-  };
+  var skin = Skin.createSkin(skinClass);
+  skin.image = svgImage;
 
   SVGUtil.loadSvg(SVG_URL + '/' + imageUrl, function(svgElement) {
     skin.size = SVGUtil.getSize(svgElement);
@@ -444,9 +597,12 @@ Skin.importSvg = function(skinClass) {
   return skin;
 }
 
-Skin.createBaseSkin = function(skinClass) {
-  var skin = Skin.importSvg(skinClass);
-  return skin;
+Skin.hitTest = function(skin, pt) {
+  return true;
+}
+
+Skin.move = function(skin, vector) {
+  skin.offset = MathUtil.subtractPoints(skin.offset, vector);
 }
 
 app.directive("skinClassDialog", function() {
@@ -458,7 +614,7 @@ app.directive("skinClassDialog", function() {
     templateUrl: 'js/directives/skin-class-dialog/skin-class-dialog.html',
     link: function($scope, $element, $attrs) {
       $scope.skinClass = 'Body';
-      $scope.skinClasses = Person.composition.slice(0).sort(function(a, b) {
+      $scope.skinClasses = Person.getComposition().slice(0).sort(function(a, b) {
         if (a.z == b.z) {
           return 0;
         }

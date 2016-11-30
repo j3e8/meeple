@@ -1,24 +1,26 @@
 var Person = {};
 
-Person.composition = [
-  { 'z': 10, 'class': 'RearArm' },
-  { 'z': 20, 'class': 'RearLeg' },
-  { 'z': 30, 'class': 'Body' },
-  { 'z': 40, 'class': 'HairBehind' },
-  { 'z': 50, 'class': 'Head' },
-  { 'z': 60, 'class': 'Eyes' },
-  { 'z': 70, 'class': 'Eyebrows' },
-  { 'z': 80, 'class': 'Beard' },
-  { 'z': 90, 'class': 'Nose' },
-  { 'z': 100, 'class': 'Mouth' },
-  { 'z': 110, 'class': 'Hair' },
-  { 'z': 120, 'class': 'FrontLeg' },
-  { 'z': 130, 'class': 'FrontArm' }
-];
+Person.getComposition = function() {
+  return [
+    { 'z': 10, 'class': 'RearArm' },
+    { 'z': 20, 'class': 'RearLeg' },
+    { 'z': 30, 'class': 'Body' },
+    { 'z': 40, 'class': 'HairBehind' },
+    { 'z': 50, 'class': 'Head' },
+    { 'z': 60, 'class': 'Eyes' },
+    { 'z': 70, 'class': 'Eyebrows' },
+    { 'z': 80, 'class': 'Beard' },
+    { 'z': 90, 'class': 'Nose' },
+    { 'z': 100, 'class': 'Mouth' },
+    { 'z': 110, 'class': 'Hair' },
+    { 'z': 120, 'class': 'FrontLeg' },
+    { 'z': 130, 'class': 'FrontArm' }
+  ];
+}
 
 Person.create = function() {
   return {
-    composition: Person.composition
+    composition: Person.getComposition()
   }
 }
 
@@ -57,20 +59,20 @@ Person.render = function(ctx, person, canvasSize, scale) {
   });
 }
 
-Person.calculateComponentPoint = function(component, scale) {
+Person.calculateSkinPoint = function(skin, scale) {
   var pos = {
     x: 0,
     y: 0
   };
-  if (component.armature.offset) {
-    pos.x = -component.armature.offset.x * scale;
-    pos.y = -component.armature.offset.y * scale;
+  if (skin.offset) {
+    pos.x = -skin.offset.x * scale;
+    pos.y = -skin.offset.y * scale;
   }
   return pos;
 }
 
 Person.renderComponentSkin = function(ctx, component, skin, position, scale) {
-  var pt = Person.calculateComponentPoint(component, scale);
+  var pt = Person.calculateSkinPoint(skin, scale);
   if (skin.size) {
     ctx.save();
     ctx.translate(position.x, position.y);
@@ -86,4 +88,11 @@ Person.renderComponentSkin = function(ctx, component, skin, position, scale) {
 
     ctx.restore();
   }
+}
+
+Person.addSkin = function(person, skin) {
+  var comp = person.composition.find(function(c) {
+    return c.class == skin.class;
+  });
+  comp.skin = skin;
 }

@@ -1,6 +1,7 @@
 var RearLeg = {};
 
 RearLeg.armature = {
+  class: 'RearLeg',
   id: 'rearleg',
   imageUrl: 'leg.svg',
   footPosition: { x: 45.7, y: 0 },

@@ -17,8 +17,8 @@ SVGUtil.loadSvg = function(url, callback) {
 
 SVGUtil.getSize = function(svgElement) {
   var svgSize = {
-    width: parseFloat(svgElement.getAttribute('width')) || svgElement.getAttribute('viewBox').split(' ')[2],
-    height: parseFloat(svgElement.getAttribute('height')) || svgElement.getAttribute('viewBox').split(' ')[3]
+    width: parseFloat(svgElement.getAttribute('width')) || parseFloat(svgElement.getAttribute('viewBox').split(' ')[2]),
+    height: parseFloat(svgElement.getAttribute('height')) || parseFloat(svgElement.getAttribute('viewBox').split(' ')[3])
   };
   return svgSize;
 }

@@ -13,3 +13,10 @@ MathUtil.scalePoint = function(pt, scale) {
     y: pt.y * scale
   }
 }
+
+MathUtil.subtractPoints = function(a, b) {
+  return {
+    x: a.x - b.x,
+    y: a.y - b.y
+  }
+}

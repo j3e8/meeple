@@ -1,6 +1,7 @@
 var FrontArm = {};
 
 FrontArm.armature = {
+  class: 'FrontArm',
   id: 'frontarm',
   imageUrl: 'arm.svg',
   handPosition: { x: 51.2, y: -0.1 },

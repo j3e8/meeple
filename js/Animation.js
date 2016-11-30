@@ -14,6 +14,10 @@ function Animation(htmlContainer, animationCallback, renderCallback, viewSize) {
     fillParent();
   });
 
+  this.getCanvas = function() {
+    return htmlCanvas;
+  }
+
   this.getWidth = function() {
     return htmlCanvas.width;
   }
