@@ -332,7 +332,7 @@ app.directive("artboard", function() {
       }
 
       function mouseDown(pt) {
-        for (var i=0; i < person.composition.length; i++) {
+        for (var i=person.composition.length - 1; i >=0; i--) {
           var scaledPt = MathUtil.scalePoint(pt, 1 / scale);
           if (person.composition[i].skin && Skin.hitTest(person, person.composition[i].skin, scaledPt)) {
             MouseState.draggedSkin = person.composition[i].skin;
