@@ -104,6 +104,13 @@ MathUtil.subtractPoints = function(a, b) {
   }
 }
 
+MathUtil.isPointInsideBox = function(pt, box) {
+  if (pt.x >= box.x && pt.x <= box.x + box.width && pt.y >= box.y && pt.y <= box.y + box.height) {
+    return true;
+  }
+  return false;
+}
+
 var MouseState = {
   draggedSkin: null,
   lastDownPoint: {
@@ -170,7 +177,9 @@ Person.render = function(ctx, person, canvasSize, scale) {
 
       var pos = Object.assign({}, center);
       if (window[c.class].getPosition) {
-        pos = window[c.class].getPosition(center, scale);
+        var tmp = window[c.class].getPosition();
+        var scaledPosition = MathUtil.scalePoint(tmp, scale);
+        pos = MathUtil.addPoints(center, scaledPosition);
       }
       Person.renderComponentSkin(ctx, window[c.class], c.skin, pos, scale);
     }
@@ -252,9 +261,6 @@ app.directive("artboard", function() {
         height: 450
       };
 
-      var basePerson = Person.createBaseSkin();
-      var person = Person.create();
-
       var ani = new Animation(document.getElementById('artboard'), animate, render, viewSize);
       ani.getCanvas().addEventListener("mousedown", function(event) {
         var rect = ani.getCanvas().getBoundingClientRect();
@@ -273,6 +279,15 @@ app.directive("artboard", function() {
       });
 
       var scale = 1;
+      var basePerson = Person.createBaseSkin();
+      var person = Person.create();
+
+      function centerPerson() {
+        person.position = {
+          x: (ani.getWidth() / 2) / scale,
+          y: (ani.getHeight() / 2) / scale
+        };
+      }
 
       function animate(elapsedTime) {
         var canvasSize = {
@@ -283,6 +298,7 @@ app.directive("artboard", function() {
         var xscale = canvasSize.width / viewSize.width;
         var yscale = canvasSize.height / viewSize.height;
         scale = Math.min(xscale, yscale);
+        centerPerson();
 
         return true;
       }
@@ -317,7 +333,8 @@ app.directive("artboard", function() {
 
       function mouseDown(pt) {
         for (var i=0; i < person.composition.length; i++) {
-          if (person.composition[i].skin && Skin.hitTest(person.composition[i].skin, pt)) {
+          var scaledPt = MathUtil.scalePoint(pt, 1 / scale);
+          if (person.composition[i].skin && Skin.hitTest(person, person.composition[i].skin, scaledPt)) {
             MouseState.draggedSkin = person.composition[i].skin;
             break;
           }
@@ -330,7 +347,6 @@ app.directive("artboard", function() {
         if (MouseState.draggedSkin) {
           var delta = MathUtil.subtractPoints(pt, MouseState.lastMovePoint);
           var scaledDelta = MathUtil.scalePoint(delta, 1 / scale);
-          console.log(delta, scaledDelta);
           Skin.move(MouseState.draggedSkin, scaledDelta);
         }
         MouseState.lastMovePoint = Object.assign({}, pt);
@@ -422,8 +438,11 @@ Body.armature = {
   offset: { x: 40, y: 50 }
 }
 
-Body.getPosition = function(startPt, scale) {
-  return startPt;
+Body.getPosition = function() {
+  return {
+    x: 0,
+    y: 0
+  };
 }
 
 var Eyebrows = {};
@@ -451,9 +470,8 @@ FrontArm.armature = {
   rotation: Math.PI * 0.6
 }
 
-FrontArm.getPosition = function(startPt, scale) {
-  var scaledPosition = MathUtil.scalePoint(Body.armature.frontArmPosition, scale);
-  return MathUtil.addPoints(startPt, scaledPosition);
+FrontArm.getPosition = function() {
+  return Body.armature.frontArmPosition;
 }
 
 var FrontLeg = {};
@@ -467,9 +485,8 @@ FrontLeg.armature = {
   rotation: Math.PI * 0.52
 }
 
-FrontLeg.getPosition = function(startPt, scale) {
-  var scaledPosition = MathUtil.scalePoint(Body.armature.frontLegPosition, scale);
-  return MathUtil.addPoints(startPt, scaledPosition);
+FrontLeg.getPosition = function() {
+  return Body.armature.frontLegPosition;
 }
 
 var Hair = {};
@@ -479,9 +496,8 @@ Hair.armature = {
   id: 'hair'
 }
 
-Hair.getPosition = function(startPt, scale) {
-  var scaledPosition = MathUtil.scalePoint(Body.armature.headPosition, scale);
-  return MathUtil.addPoints(startPt, scaledPosition);
+Hair.getPosition = function() {
+  return Body.armature.headPosition;
 }
 
 var HairBehind = {};
@@ -500,9 +516,8 @@ Head.armature = {
   offset: { x: 76, y: 67 }
 }
 
-Head.getPosition = function(startPt, scale) {
-  var scaledHeadPosition = MathUtil.scalePoint(Body.armature.headPosition, scale);
-  return MathUtil.addPoints(startPt, scaledHeadPosition);
+Head.getPosition = function() {
+  return Body.armature.headPosition;
 }
 
 var Mouth = {};
@@ -530,9 +545,8 @@ RearArm.armature = {
   rotation: Math.PI * 0.32
 }
 
-RearArm.getPosition = function(startPt, scale) {
-  var scaledRearArmPosition = MathUtil.scalePoint(Body.armature.rearArmPosition, scale);
-  return MathUtil.addPoints(startPt, scaledRearArmPosition);
+RearArm.getPosition = function() {
+  return Body.armature.rearArmPosition;
 }
 
 var RearLeg = {};
@@ -546,9 +560,8 @@ RearLeg.armature = {
   rotation: Math.PI * 0.5
 }
 
-RearLeg.getPosition = function(startPt, scale) {
-  var scaledPosition = MathUtil.scalePoint(Body.armature.rearLegPosition, scale);
-  return MathUtil.addPoints(startPt, scaledPosition);
+RearLeg.getPosition = function() {
+  return Body.armature.rearLegPosition;
 }
 
 var Skin = {};
@@ -597,8 +610,26 @@ Skin.createBaseSkin = function(skinClass) {
   return skin;
 }
 
-Skin.hitTest = function(skin, pt) {
-  return true;
+Skin.hitTest = function(person, skin, pt) {
+  var bounds = Skin.getBoundingBox(skin, person.position);
+  if (bounds && MathUtil.isPointInsideBox(pt, bounds)) {
+    return true;
+  }
+  return false;
+}
+
+Skin.getBoundingBox = function(skin, personPosition) {
+  if (window[skin.class] && window[skin.class].getPosition) {
+    var relativePos = window[skin.class].getPosition();
+    var pos = MathUtil.addPoints(personPosition, relativePos);
+    return {
+      x: pos.x - skin.offset.x,
+      y: pos.y - skin.offset.y,
+      width: skin.size.width,
+      height: skin.size.height
+    }
+  }
+  return null;
 }
 
 Skin.move = function(skin, vector) {

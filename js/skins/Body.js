@@ -12,6 +12,9 @@ Body.armature = {
   offset: { x: 40, y: 50 }
 }
 
-Body.getPosition = function(startPt, scale) {
-  return startPt;
+Body.getPosition = function() {
+  return {
+    x: 0,
+    y: 0
+  };
 }

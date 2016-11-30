@@ -10,9 +10,6 @@ app.directive("artboard", function() {
         height: 450
       };
 
-      var basePerson = Person.createBaseSkin();
-      var person = Person.create();
-
       var ani = new Animation(document.getElementById('artboard'), animate, render, viewSize);
       ani.getCanvas().addEventListener("mousedown", function(event) {
         var rect = ani.getCanvas().getBoundingClientRect();
@@ -31,6 +28,15 @@ app.directive("artboard", function() {
       });
 
       var scale = 1;
+      var basePerson = Person.createBaseSkin();
+      var person = Person.create();
+
+      function centerPerson() {
+        person.position = {
+          x: (ani.getWidth() / 2) / scale,
+          y: (ani.getHeight() / 2) / scale
+        };
+      }
 
       function animate(elapsedTime) {
         var canvasSize = {
@@ -41,6 +47,7 @@ app.directive("artboard", function() {
         var xscale = canvasSize.width / viewSize.width;
         var yscale = canvasSize.height / viewSize.height;
         scale = Math.min(xscale, yscale);
+        centerPerson();
 
         return true;
       }
@@ -75,7 +82,8 @@ app.directive("artboard", function() {
 
       function mouseDown(pt) {
         for (var i=0; i < person.composition.length; i++) {
-          if (person.composition[i].skin && Skin.hitTest(person.composition[i].skin, pt)) {
+          var scaledPt = MathUtil.scalePoint(pt, 1 / scale);
+          if (person.composition[i].skin && Skin.hitTest(person, person.composition[i].skin, scaledPt)) {
             MouseState.draggedSkin = person.composition[i].skin;
             break;
           }
@@ -88,7 +96,6 @@ app.directive("artboard", function() {
         if (MouseState.draggedSkin) {
           var delta = MathUtil.subtractPoints(pt, MouseState.lastMovePoint);
           var scaledDelta = MathUtil.scalePoint(delta, 1 / scale);
-          console.log(delta, scaledDelta);
           Skin.move(MouseState.draggedSkin, scaledDelta);
         }
         MouseState.lastMovePoint = Object.assign({}, pt);

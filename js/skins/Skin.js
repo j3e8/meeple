@@ -44,8 +44,26 @@ Skin.createBaseSkin = function(skinClass) {
   return skin;
 }
 
-Skin.hitTest = function(skin, pt) {
-  return true;
+Skin.hitTest = function(person, skin, pt) {
+  var bounds = Skin.getBoundingBox(skin, person.position);
+  if (bounds && MathUtil.isPointInsideBox(pt, bounds)) {
+    return true;
+  }
+  return false;
+}
+
+Skin.getBoundingBox = function(skin, personPosition) {
+  if (window[skin.class] && window[skin.class].getPosition) {
+    var relativePos = window[skin.class].getPosition();
+    var pos = MathUtil.addPoints(personPosition, relativePos);
+    return {
+      x: pos.x - skin.offset.x,
+      y: pos.y - skin.offset.y,
+      width: skin.size.width,
+      height: skin.size.height
+    }
+  }
+  return null;
 }
 
 Skin.move = function(skin, vector) {

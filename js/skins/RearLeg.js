@@ -9,7 +9,6 @@ RearLeg.armature = {
   rotation: Math.PI * 0.5
 }
 
-RearLeg.getPosition = function(startPt, scale) {
-  var scaledPosition = MathUtil.scalePoint(Body.armature.rearLegPosition, scale);
-  return MathUtil.addPoints(startPt, scaledPosition);
+RearLeg.getPosition = function() {
+  return Body.armature.rearLegPosition;
 }

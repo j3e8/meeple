@@ -9,7 +9,6 @@ FrontLeg.armature = {
   rotation: Math.PI * 0.52
 }
 
-FrontLeg.getPosition = function(startPt, scale) {
-  var scaledPosition = MathUtil.scalePoint(Body.armature.frontLegPosition, scale);
-  return MathUtil.addPoints(startPt, scaledPosition);
+FrontLeg.getPosition = function() {
+  return Body.armature.frontLegPosition;
 }

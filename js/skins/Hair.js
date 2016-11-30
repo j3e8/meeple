@@ -5,7 +5,6 @@ Hair.armature = {
   id: 'hair'
 }
 
-Hair.getPosition = function(startPt, scale) {
-  var scaledPosition = MathUtil.scalePoint(Body.armature.headPosition, scale);
-  return MathUtil.addPoints(startPt, scaledPosition);
+Hair.getPosition = function() {
+  return Body.armature.headPosition;
 }

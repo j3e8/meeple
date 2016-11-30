@@ -52,7 +52,9 @@ Person.render = function(ctx, person, canvasSize, scale) {
 
       var pos = Object.assign({}, center);
       if (window[c.class].getPosition) {
-        pos = window[c.class].getPosition(center, scale);
+        var tmp = window[c.class].getPosition();
+        var scaledPosition = MathUtil.scalePoint(tmp, scale);
+        pos = MathUtil.addPoints(center, scaledPosition);
       }
       Person.renderComponentSkin(ctx, window[c.class], c.skin, pos, scale);
     }

@@ -7,7 +7,6 @@ Head.armature = {
   offset: { x: 76, y: 67 }
 }
 
-Head.getPosition = function(startPt, scale) {
-  var scaledHeadPosition = MathUtil.scalePoint(Body.armature.headPosition, scale);
-  return MathUtil.addPoints(startPt, scaledHeadPosition);
+Head.getPosition = function() {
+  return Body.armature.headPosition;
 }

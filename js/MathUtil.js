@@ -20,3 +20,10 @@ MathUtil.subtractPoints = function(a, b) {
     y: a.y - b.y
   }
 }
+
+MathUtil.isPointInsideBox = function(pt, box) {
+  if (pt.x >= box.x && pt.x <= box.x + box.width && pt.y >= box.y && pt.y <= box.y + box.height) {
+    return true;
+  }
+  return false;
+}
