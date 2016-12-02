@@ -22,7 +22,7 @@ app.controller("mainController", function($scope, $http) {
     { id: 'suburb', name: 'Suburb'}
   ];
   $scope.selectedThemes = [];
-  $scope.skinClassDialogIsDisplayed = undefined;
+  $scope.layerClassDialogIsDisplayed = undefined;
 
   $scope.dragOver = function(event) {
     event.preventDefault();
@@ -41,16 +41,16 @@ app.controller("mainController", function($scope, $http) {
   $scope.importSvg = function(event) {
     event.preventDefault();
     event.stopPropagation();
-    $scope.skinClass = null;
-    $scope.skinClassDialogIsDisplayed = true;
+    $scope.layerClass = null;
+    $scope.layerClassDialogIsDisplayed = true;
     $scope.importedFile = event.dataTransfer.files[0];
     $scope.$apply();
   }
 
-  $scope.addSvgToView = function(skinClass) {
-    $scope.skinClassDialogIsDisplayed = false;
+  $scope.addSvgToView = function(layerClass) {
+    $scope.layerClassDialogIsDisplayed = false;
     $scope.$broadcast("importSvg", {
-      'skinClass': skinClass,
+      'layerClass': layerClass,
       'file': $scope.importedFile
     });
   }

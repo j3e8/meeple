@@ -21,8 +21,8 @@ RenderUtil.transformContextForComponent = function(ctx, person, component, scale
     ctx.translate(pos.x, pos.y);
   }
 
-  if (component.skin.rotation) {
-    // console.log('rotate', component.skin.rotation);
-    ctx.rotate(component.skin.rotation);
+  if (component.layer && component.layer.rotation) {
+    // console.log('rotate', component.layer.rotation);
+    ctx.rotate(component.layer.rotation);
   }
 }

@@ -28,7 +28,7 @@ app.directive("artboard", function() {
       });
 
       var scale = 1;
-      var basePerson = Person.createBaseSkin();
+      var basePerson = Person.createBaseLayer();
       var person = Person.create();
 
       function centerPerson() {
@@ -69,23 +69,23 @@ app.directive("artboard", function() {
       $scope.$on("importSvg", function($event, data) {
         var reader = new FileReader();
         reader.onload = function () {
-          $scope.createSkin(data.skinClass, reader.result);
+          $scope.createLayer(data.layerClass, reader.result);
         };
         reader.readAsDataURL(data.file);
       });
 
-      $scope.createSkin = function(skinClass, data) {
-        if (window[skinClass]) {
-          var newSkin = Skin.importSvg(window[skinClass], data);
-          Person.addSkin(person, newSkin);
+      $scope.createLayer = function(layerClass, data) {
+        if (window[layerClass]) {
+          var newLayer = Layer.importSvg(window[layerClass], data);
+          Person.addLayer(person, newLayer);
         }
       }
 
       function mouseDown(pt) {
         for (var i=person.composition.length - 1; i >=0; i--) {
           var scaledPt = MathUtil.scalePoint(pt, 1 / scale);
-          if (person.composition[i].skin && Skin.hitTest(person, person.composition[i].skin, scaledPt)) {
-            MouseState.draggedSkin = person.composition[i].skin;
+          if (person.composition[i].layer && Layer.hitTest(person, person.composition[i].layer, scaledPt)) {
+            MouseState.draggedLayer = person.composition[i].layer;
             break;
           }
         }
@@ -94,16 +94,16 @@ app.directive("artboard", function() {
       }
 
       function mouseMove(pt) {
-        if (MouseState.draggedSkin) {
+        if (MouseState.draggedLayer) {
           var delta = MathUtil.subtractPoints(pt, MouseState.lastMovePoint);
           var scaledDelta = MathUtil.scalePoint(delta, 1 / scale);
-          Skin.move(MouseState.draggedSkin, scaledDelta);
+          Layer.move(MouseState.draggedLayer, scaledDelta);
         }
         MouseState.lastMovePoint = Object.assign({}, pt);
       }
 
       function mouseUp(pt) {
-        MouseState.draggedSkin = null;
+        MouseState.draggedLayer = null;
       }
     }
   };

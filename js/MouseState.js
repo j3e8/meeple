@@ -1,5 +1,5 @@
 var MouseState = {
-  draggedSkin: null,
+  draggedLayer: null,
   lastDownPoint: {
     x: 0,
     y: 0
