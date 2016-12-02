@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Canvas Test</title>
+  <script>
+    window.addEventListener("load", function() {
+      render();
+    });
+
+    var image = new Image();
+    image.src = "../svg/body.svg";
+
+    function render() {
+      var htmlCanvas = document.getElementById('pants');
+      var ctx = htmlCanvas.getContext("2d");
+
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, htmlCanvas.width, htmlCanvas.height);
+
+      ctx.save();
+      ctx.drawImage(image, 0, 0, image.width, image.height);
+      ctx.translate(100, 100);
+      ctx.rotate(Math.PI * 0.25);
+      ctx.drawImage(image, 0, 0, image.width, image.height);
+      ctx.translate(100, 100);
+      ctx.rotate(Math.PI * 0.25);
+      ctx.drawImage(image, 0, 0, image.width, image.height);
+      ctx.restore();
+    }
+  </script>
+</head>
+<body>
+  <canvas id="pants" width="500" height="500"></canvas>
+</body>
+</html>

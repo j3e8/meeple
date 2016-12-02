@@ -32,10 +32,11 @@ app.directive("artboard", function() {
       var person = Person.create();
 
       function centerPerson() {
-        person.position = {
+        basePerson.position = {
           x: (ani.getWidth() / 2) / scale,
           y: (ani.getHeight() / 2) / scale
         };
+        person.position = Object.assign({}, basePerson.position);
       }
 
       function animate(elapsedTime) {

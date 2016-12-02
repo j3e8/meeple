@@ -4,7 +4,7 @@ FrontArm.armature = {
   class: 'FrontArm',
   id: 'frontarm',
   imageUrl: 'arm.svg',
-  handPosition: { x: 51.2, y: -0.1 },
+  handPosition: { x: 51.4, y: 0.4 },
   offset: { x: 14.7, y: 15.1 },
   rotation: Math.PI * 0.6
 }

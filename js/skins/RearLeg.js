@@ -4,8 +4,8 @@ RearLeg.armature = {
   class: 'RearLeg',
   id: 'rearleg',
   imageUrl: 'leg.svg',
-  footPosition: { x: 45.7, y: 0 },
-  offset: { x: 12.1, y: 32.2 },
+  footPosition: { x: 44, y: 0.1 },
+  offset: { x: 12, y: 14.4 },
   rotation: Math.PI * 0.5
 }
 
