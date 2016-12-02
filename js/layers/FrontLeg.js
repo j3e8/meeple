@@ -10,5 +10,5 @@ FrontLeg.armature = {
 }
 
 FrontLeg.getPosition = function() {
-  return Body.armature.frontLegPosition;
+  return LowerBody.armature.frontLegPosition;
 }

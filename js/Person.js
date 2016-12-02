@@ -4,9 +4,10 @@ Person.getComposition = function() {
   return [
     { 'z': 8, 'class': 'RearHand', 'probability': 1, 'baseLayer': true, 'relativeTo': 'RearArm' },
     { 'z': 10, 'class': 'RearArm', 'probability': 1, 'baseLayer': true, 'relativeTo': 'Body' },
-    { 'z': 20, 'class': 'RearLeg', 'probability': 1, 'baseLayer': true, 'relativeTo': 'Body' },
+    { 'z': 20, 'class': 'RearLeg', 'probability': 1, 'baseLayer': true, 'relativeTo': 'LowerBody' },
     { 'z': 12, 'class': 'RearFoot', 'probability': 1, 'baseLayer': true, 'relativeTo': 'RearLeg' },
     { 'z': 30, 'class': 'Body', 'probability': 1, 'baseLayer': true },
+    { 'z': 32, 'class': 'LowerBody', 'probability': 1, 'baseLayer': true, 'relativeTo': 'Body' },
     { 'z': 40, 'class': 'HairBehind', 'probability': 0, 'relativeTo': 'Head' },
     { 'z': 50, 'class': 'Head', 'probability': 1, 'baseLayer': true, 'relativeTo': 'Body' },
     { 'z': 60, 'class': 'Eyes', 'probability': 1, 'relativeTo': 'Head' },
@@ -15,7 +16,7 @@ Person.getComposition = function() {
     { 'z': 90, 'class': 'Nose', 'probability': 1, 'relativeTo': 'Head' },
     { 'z': 100, 'class': 'Mouth', 'probability': 1, 'relativeTo': 'Head' },
     { 'z': 110, 'class': 'Hair', 'probability': 0.9, 'relativeTo': 'Head' },
-    { 'z': 120, 'class': 'FrontLeg', 'probability': 1, 'baseLayer': true, 'relativeTo': 'Body' },
+    { 'z': 120, 'class': 'FrontLeg', 'probability': 1, 'baseLayer': true, 'relativeTo': 'LowerBody' },
     { 'z': 122, 'class': 'FrontFoot', 'probability': 1, 'baseLayer': true, 'relativeTo': 'FrontLeg' },
     { 'z': 128, 'class': 'FrontHand', 'probability': 1, 'baseLayer': true, 'relativeTo': 'FrontArm' },
     { 'z': 130, 'class': 'FrontArm', 'probability': 1, 'baseLayer': true, 'relativeTo': 'Body' }

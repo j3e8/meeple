@@ -10,5 +10,5 @@ RearLeg.armature = {
 }
 
 RearLeg.getPosition = function() {
-  return Body.armature.rearLegPosition;
+  return LowerBody.armature.rearLegPosition;
 }
