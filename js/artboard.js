@@ -1,4 +1,5 @@
-app.directive("artboard", function() {
+app.directive("artboard", ["Animation", "Person", "MouseState", "Layer", "MathUtil",
+function(Animation, Person, MouseState, Layer, MathUtil) {
   return {
     restrict: 'A',
     scope: {},
@@ -75,8 +76,8 @@ app.directive("artboard", function() {
       });
 
       $scope.createLayer = function(layerClass, data) {
-        if (window[layerClass]) {
-          var newLayer = Layer.importSvg(window[layerClass], data);
+        if (Layer.layers[layerClass]) {
+          var newLayer = Layer.importSvg(Layer.layers[layerClass], data);
           Person.addLayer(person, newLayer);
         }
       }
@@ -107,4 +108,4 @@ app.directive("artboard", function() {
       }
     }
   };
-});
+}]);

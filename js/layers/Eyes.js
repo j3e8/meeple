@@ -1,6 +1,10 @@
-var Eyes = {};
+app.service("Eyes", function() {
+  var Eyes = {};
 
-Eyes.armature = {
-  class: 'Eyes',
-  id: 'eyes'
-}
+  Eyes.armature = {
+    class: 'Eyes',
+    id: 'eyes'
+  }
+
+  return Eyes;
+});

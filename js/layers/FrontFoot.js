@@ -1,12 +1,16 @@
-var FrontFoot = {};
+app.service("FrontFoot", ["FrontLeg", function(FrontLeg) {
+  var FrontFoot = {};
 
-FrontFoot.armature = {
-  class: 'FrontFoot',
-  id: 'frontfoot',
-  imageUrl: 'foot.svg',
-  offset: { x: 6.3, y: 32 }
-}
+  FrontFoot.armature = {
+    class: 'FrontFoot',
+    id: 'frontfoot',
+    imageUrl: 'foot.svg',
+    offset: { x: 6.3, y: 32 }
+  }
 
-FrontFoot.getPosition = function() {
-  return FrontLeg.armature.footPosition;
-}
+  FrontFoot.getPosition = function() {
+    return FrontLeg.armature.footPosition;
+  }
+
+  return FrontFoot;
+}]);

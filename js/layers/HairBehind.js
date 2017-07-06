@@ -1,6 +1,10 @@
-var HairBehind = {};
+app.service("HairBehind", function() {
+  var HairBehind = {};
 
-HairBehind.armature = {
-  class: 'HairBehind',
-  id: 'hairbehind'
-}
+  HairBehind.armature = {
+    class: 'HairBehind',
+    id: 'hairbehind'
+  }
+
+  return HairBehind;
+});

@@ -1,4 +1,4 @@
-app.directive("layerClassDialog", function() {
+app.directive("layerClassDialog", ["Person", function(Person) {
   return {
     restrict: 'E',
     scope: {
@@ -15,4 +15,4 @@ app.directive("layerClassDialog", function() {
       })
     }
   }
-});
+}]);

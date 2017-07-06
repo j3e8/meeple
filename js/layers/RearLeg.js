@@ -1,14 +1,18 @@
-var RearLeg = {};
+app.service("RearLeg", ["LowerBody", function(LowerBody) {
+  var RearLeg = {};
 
-RearLeg.armature = {
-  class: 'RearLeg',
-  id: 'rearleg',
-  imageUrl: 'leg.svg',
-  footPosition: { x: 44, y: 0.1 },
-  offset: { x: 12, y: 14.4 },
-  rotation: Math.PI * 0.5
-}
+  RearLeg.armature = {
+    class: 'RearLeg',
+    id: 'rearleg',
+    imageUrl: 'leg.svg',
+    footPosition: { x: 44, y: 0.1 },
+    offset: { x: 12, y: 14.4 },
+    rotation: Math.PI * 0.5
+  }
 
-RearLeg.getPosition = function() {
-  return LowerBody.armature.rearLegPosition;
-}
+  RearLeg.getPosition = function() {
+    return LowerBody.armature.rearLegPosition;
+  }
+
+  return RearLeg;
+}]);
